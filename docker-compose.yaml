@@ -1,0 +1,107 @@
+# === Copyright
+#
+# Copyright (C) 2020  Atos Spain SA. All rights reserved.
+#
+# === License
+#
+# docker-compose.yaml is free software: you can redistribute it and/or modify it under the 
+# terms of the Apache License, Version 2.0 (the License);
+# 
+# http://www.apache.org/licenses/LICENSE-2.0
+# 
+# The software is provided "AS IS", without any warranty of any kind, express or implied,
+# including but not limited to the warranties of merchantability, fitness for a particular
+# purpose and noninfringement, in no event shall the authors or copyright holders be 
+# liable for any claim, damages or other liability, whether in action of contract, tort or
+# otherwise, arising from, out of or in connection with the software or the use or other
+# dealings in the software.
+# 
+# See README file for the full disclaimer information and LICENSE file for full license 
+# information in the project root.
+# 
+# == docker-compose.yml
+#
+# Service composition to deploy the microservices architecture with Nginx, Keycloak, Service 
+# Discovery, PPDDM Manager, F4H Portal GUI and F4H Backend.
+#
+# === Authors
+#
+# Author	Atos Research and Innovation, Atos SPAIN SA
+# 
+
+version: '3'
+
+services:
+# The reverse proxy providing https and redirecting to the rest of the services
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    container_name: nginx-proxy
+#    labels:
+#      com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy: "true"
+    volumes:
+# Valid certificates configuration
+#      - ${CONFIG_ROOT_FOLDER}/certs:/etc/nginx/certs 
+# Letsencrypt certificates configuration
+#      - certs:/etc/nginx/certs
+#      - vhost.d:/etc/nginx/vhost.d
+#      - nginx:/usr/share/nginx/html
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    network_mode: host
+    ports:
+# Production configuration
+#      - 443:443
+      - 80:80
+    restart: always
+# Letsencrypt nginx certificates provider
+#  letsencrypt-nginx-proxy-companion:
+#    image: jrcs/letsencrypt-nginx-proxy-companion:v1.9.1
+#    depends_on:
+#      - nginx-proxy
+#    volumes:
+#      - certs:/etc/nginx/certs
+#      - vhost.d:/etc/nginx/vhost.d
+#      - nginx:/usr/share/nginx/html
+#      - /var/run/docker.sock:/tmp/docker.sock:ro
+
+# MySQL database for KeyCloak
+  mysql:
+    image: mysql:5.7
+    container_name: mysql
+    volumes:
+      - ${CONFIG_FOLDER}/mysql/data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DB}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    restart: always
+    
+# KeyCloak IdM configured for MySQL
+  keycloak:
+#    image: jboss/keycloak:3.4.3.Final
+    image: jboss/keycloak
+    container_name: keycloak
+    environment:
+      PROXY_ADDRESS_FORWARDING: ${PROXY_ADDRESS_FORWARDING}
+      VIRTUAL_HOST: ${KEYCLOAK_VIRTUAL_HOST}
+      DB_VENDOR: ${MYSQL_VENDOR}
+      DB_ADDR: ${MYSQL_ADDR}
+      DB_DATABASE: ${MYSQL_DB}
+      DB_USER: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      KEYCLOAK_USER: ${KEYCLOAK_USER}
+      KEYCLOAK_PASSWORD: ${KEYCLOAK_PASSWORD}
+      JDBC_PARAMS: "useSSL=false"
+# Configuration for 3.4.3
+      MYSQL_PORT_3306_TCP_ADDR: ${MYSQL_TCP_ADDR}
+      MYSQL_PORT_3306_TCP_PORT: ${MYSQL_TCP_PORT}
+    volumes: 
+      - ${CONFIG_FOLDER}/log/keycloak:/opt/jboss/keycloak/standalone/log
+    ports:
+      - 8080:8080
+    depends_on:
+      mysql:
+          condition: service_healthy
+    depends_on:
+      - mysql
+    restart: always
