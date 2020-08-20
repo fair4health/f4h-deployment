@@ -105,7 +105,7 @@ services:
     depends_on:
       - mysql
     restart: always
-# KeyCloak proxy to authenticate Kibana
+# KeyCloak proxy to authenticate Consul
   keycloak-proxy:
     image: jboss/keycloak-proxy:3.4.2.Final
 #    image: jboss/keycloak-proxy
