@@ -54,14 +54,15 @@ The project comes with a [docker-compose](https://docs.docker.com/compose/) whic
 3. Access the Keycloak console `http://localhost:8080` (**user**: admin, **password**: Pa55w0rd)
       * Create a realm `FAIR4Health`
 		* Inside the realm create a client_id: `fair4health-client`
-		* Create a user: fair4health-test. Modify the creadentials (temporary off)
+		* Create a user: fair4health-test. Modify the credentials (temporary off)
 		* Inside the realm create a client_id: `consul-client` with Valid Redirect URI `http://discovery/*`
-		* Create a user: fair4health-discover. Modify the creadentials (temporary off)
-4. Access the authenticator `http://localhost:8081/swagger-ui.html`
+		* Create a user: fair4health-discover. Modify the credentials (temporary off)
+4. Access the Consul GUI at `http://discovery`, it should redirect to Keycloak. Include the credentials for consul-client
+5. Access the authenticator at `http://localhost:8083/oauth/swagger-ui.html`
       * Open Login operation under Auth controller, `Try it out`:
-      * In the JSON include the user created in Keycloak (`test`)
+      * In the JSON include the user created in Keycloak (`fair4health-test`)
       * The response is a OAuth access token
-5. Access the portal ``
+6. Access the portal ``
 ```
 
 The nginx reverse proxy allows also accessing using domains: discovery and keycloak (if you redirect the domains to localhost or the IP where you are deploying the containers).
