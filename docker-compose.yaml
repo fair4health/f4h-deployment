@@ -114,8 +114,6 @@ services:
       KEYCLOAK_URL: ${KEYCLOAK_URL}
       KEYCLOAK_REALM: ${KEYCLOAK_REALM}
       KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID}
-    ports:
-      - 8081:8081
     restart: always
     
 # KeyCloak proxy to authenticate Consul
