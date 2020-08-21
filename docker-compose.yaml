@@ -105,6 +105,19 @@ services:
     depends_on:
       - mysql
     restart: always
+
+# Auth service
+  auth:
+    image: arihealth/oauth-easy:latest
+    container_name: oauth-fair4health
+    environment:
+      KEYCLOAK_URL: ${KEYCLOAK_URL}
+      KEYCLOAK_REALM: ${KEYCLOAK_REALM}
+      KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID}
+    ports:
+      - 8081:8081
+    restart: always
+    
 # KeyCloak proxy to authenticate Consul
   keycloak-proxy:
     image: jboss/keycloak-proxy:3.4.2.Final
@@ -139,4 +152,17 @@ services:
       CONSUL_BIND_INTERFACE: eth0
     ports:
       - "8500:8500"
+    restart: always
+
+# Gateway service
+  gateway:
+    image: fair4health/gateway:latest
+    container_name: gateway
+    environment:
+      PROXY_ADDRESS_FORWARDING: ${PROXY_ADDRESS_FORWARDING}
+      VIRTUAL_HOST: ${GATEWAY_VIRTUAL_HOST}
+      OAUTH_EASY_URL: ${OAUTH_EASY_URL}
+      DISCOVERY_URL: ${DISCOVERY_URL}
+    ports:
+      - 8083:8083
     restart: always
