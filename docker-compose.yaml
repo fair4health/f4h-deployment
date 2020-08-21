@@ -46,7 +46,7 @@ services:
 #      - vhost.d:/etc/nginx/vhost.d
 #      - nginx:/usr/share/nginx/html
       - /var/run/docker.sock:/tmp/docker.sock:ro
-    network_mode: host
+#    network_mode: host
     ports:
 # Production configuration
 #      - 443:443
@@ -104,4 +104,39 @@ services:
           condition: service_healthy
     depends_on:
       - mysql
+    restart: always
+# KeyCloak proxy to authenticate Consul
+  keycloak-proxy:
+    image: jboss/keycloak-proxy:3.4.2.Final
+#    image: jboss/keycloak-proxy
+    container_name: keycloak-proxy
+    environment: 
+      PROXY_ADDRESS_FORWARDING: ${PROXY_ADDRESS_FORWARDING}
+      VIRTUAL_HOST: ${KEYCLOAK_PROXY_VIRTUAL_HOST}
+      VIRTUAL_PORT: ${KEYCLOAK_PROXY_VIRTUAL_PORT}
+      TARGET_URL: ${KEYCLOAK_PROXY_TARGET_URL}
+      BIND_ADDRESS: ${KEYCLOAK_PROXY_BIND_ADDRESS}
+      HTTP_PORT: ${KEYCLOAK_PROXY_HTTP_PORT}
+      BASE_PATH: ${KEYCLOAK_PROXY_BASE_PATH}
+      REALM_NAME: ${KEYCLOAK_PROXY_REALM_NAME}
+      AUTH_SERVER_URL: ${KEYCLOAK_PROXY_AUTH_SERVER}
+      CLIENT_ID: ${KEYCLOAK_PROXY_CLIENT_ID}
+      ROLE_ALLOWED: ${KEYCLOAK_PROXY_ROLE_ALLOWED}
+      SSL_REQUIRED: ${KEYCLOAK_PROXY_SSL_REQUIRED}
+    volumes: 
+      - ${CONFIG_FOLDER}/keycloak/conf/proxy.json:/opt/jboss/conf/proxy.json
+    ports:
+      - 8180:8180
+    depends_on:
+      - consul
+      - keycloak
+    restart: always
+# Consul GUI to manage services
+  consul:
+    container_name: consul
+    image: consul:1.8.1
+    environment:
+      CONSUL_BIND_INTERFACE: eth0
+    ports:
+      - "8500:8500"
     restart: always
