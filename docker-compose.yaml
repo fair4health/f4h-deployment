@@ -74,6 +74,8 @@ services:
       MYSQL_DATABASE: ${MYSQL_DB}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - 3306:3306
     restart: always
     
 # KeyCloak IdM configured for MySQL
@@ -163,4 +165,17 @@ services:
       DISCOVERY_URL: ${DISCOVERY_URL}
     ports:
       - 8083:8083
+    restart: always
+    
+
+# Service Discovery service
+  discovery:
+    image: fair4health/service-discovery:latest
+    container_name: service-discovery
+    environment:
+      CONSUL_HOST: ${CONSUL_HOST}
+      CONSUL_PORT: ${CONSUL_PORT}
+      CONSUL_ENABLED: ${CONSUL_ENABLED}
+      CONSUL_HEALTH_CHECK_INTERVAL: ${CONSUL_HEALTH_CHECK_INTERVAL}
+      CONSUL_HEALTH_CHECK_TIMEOUT: ${CONSUL_HEALTH_CHECK_TIMEOUT}
     restart: always
