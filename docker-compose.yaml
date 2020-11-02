@@ -166,7 +166,6 @@ services:
     ports:
       - 8083:8083
     restart: always
-    
 
 # Service Discovery service
   discovery:
@@ -178,4 +177,16 @@ services:
       CONSUL_ENABLED: ${CONSUL_ENABLED}
       CONSUL_HEALTH_CHECK_INTERVAL: ${CONSUL_HEALTH_CHECK_INTERVAL}
       CONSUL_HEALTH_CHECK_TIMEOUT: ${CONSUL_HEALTH_CHECK_TIMEOUT}
+    restart: always
+
+# Portal UI
+  f4h-portal-ui:
+    image: fair4health/f4h-portal-ui:latest
+    container_name: f4h-portal-ui
+    environment:
+      PROXY_ADDRESS_FORWARDING: ${PROXY_ADDRESS_FORWARDING}
+      VIRTUAL_HOST: ${PORTAL_VIRTUAL_HOST}
+      VIRTUAL_PORT: ${PORTAL_VIRTUAL_PORT}
+    ports:
+      - 4201:4200
     restart: always
