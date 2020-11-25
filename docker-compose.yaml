@@ -116,6 +116,7 @@ services:
       KEYCLOAK_URL: ${KEYCLOAK_URL}
       KEYCLOAK_REALM: ${KEYCLOAK_REALM}
       KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID}
+      KEYCLOAK_SECRET: ${KEYCLOAK_SECRET}
     restart: always
     
 # KeyCloak proxy to authenticate Consul
